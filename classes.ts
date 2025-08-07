@@ -15,6 +15,7 @@ export interface Material {
 	thermalConductivity: number; // [W/m·K]
 	specificHeat: number; // [J/kg·K] Number.MAX_SAFE_INTEGER?
 	emissivity?: number; // [0-1] for radiation calculations
+	absorptivity?: number; // [0-1] for radiation calculations
 	density: number; // [kg/m³]
 }
 
@@ -66,20 +67,32 @@ export class ConductionStrategy implements HeatTransferStrategy {
 		private surfaceArea: number, // [m²]
 	) {}
 
-	calculateHeatTransfer(
-		node1: ThermalComponent,
-		node2: ThermalComponent,
-	): number {
-		const deltaTemp = node1.temperature - node2.temperature;
-		if (node1.material !== node2.material) {
-			throw new Error(
-				"Nodes must have the same material for conduction calculations.",
-			);
-		}
+	calculateHeatTransfer(from: ThermalComponent, to: ThermalComponent): number {
+		const deltaTemp = from.temperature - to.temperature;
 
 		return (
-			(node1.material.thermalConductivity * this.surfaceArea * deltaTemp) /
+			(from.material.thermalConductivity * this.surfaceArea * deltaTemp) /
 			this.length
+		);
+	}
+}
+
+export class SolarAbsorbtionStrategy implements HeatTransferStrategy {
+	constructor(
+		private wattsPerMeterSquared: number,
+		private surfaceAreaMetersSquared: number,
+	) {}
+
+	calculateHeatTransfer(from: ThermalComponent, to: ThermalComponent): number {
+		if (!to.material.absorptivity) {
+			throw new Error(
+				"Target material absorptivity must be defined for ambient heat transfer calculations.",
+			);
+		}
+		return (
+			this.wattsPerMeterSquared *
+			this.surfaceAreaMetersSquared *
+			to.material.absorptivity
 		);
 	}
 }
@@ -89,7 +102,7 @@ export class ThermalComponent {
 	material: Material;
 	volume: number; // [m³]
 	temperature: number; // [K]
-	log: number[][]; // [time, temperature] pairs
+	log: number[][] = []; // [time, temperature] pairs
 
 	constructor(
 		id: string,
@@ -138,14 +151,6 @@ export class ThermalGraph {
 	nodes: ThermalComponent[] = [];
 	edges: HeatTransferEdge[] = [];
 
-	addNode(node: ThermalComponent) {
-		this.nodes.push(node);
-	}
-
-	addEdge(edge: HeatTransferEdge) {
-		this.edges.push(edge);
-	}
-
 	simulateStep(dt: number, elapsedTime: number) {
 		const componentToNetHeat = new Map<ThermalComponent, number>();
 
@@ -176,24 +181,25 @@ export class ThermalGraph {
 	}
 
 	writeNodeLogsToCSV() {
-		const writer = csvWriter.createObjectCsvWriter({
-			path: "./node_logs.csv",
-			header: this.nodes.flatMap((node, i) => [
-				{ id: `node_${i}`, title: node.id },
-				{ id: `time_${i}`, title: "Time" },
-				{ id: `temperature_${i}`, title: "Temperature" },
-			]),
-		});
-		const records = this.nodes.flatMap((node, i) => {
-			return node.log.map(([time, temperature]) => {
-				const record: Record<string, number | string> = {};
-				record[`node_${i}`] = node.id;
-				record[`time_${i}`] = time;
-				record[`temperature_${i}`] = temperature;
-				return record;
-			});
-		});
+		Promise.all(
+			this.nodes.map(async (node) => {
+				const writer = csvWriter.createObjectCsvWriter({
+					path: `./${node.id.split(" ").join("_")}.csv`,
+					header: [
+						{ id: "time", title: "Time" },
+						{ id: "temperature", title: "Temperature" },
+					],
+				});
 
-		writer.writeRecords(records);
+				const records = node.log.map(([time, temperature]) => {
+					const record: Record<string, number | string> = {};
+					record.time = time;
+					record.temperature = temperature;
+					return record;
+				});
+
+				await writer.writeRecords(records);
+			}),
+		);
 	}
 }
