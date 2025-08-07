@@ -1,14 +1,13 @@
 import {
-	ConductionStrategy,
-	ConvectionStrategy,
-	RadiationStrategy,
-	type Material,
-	HeatTransferStrategy,
-	ThermalComponent,
 	HeatTransferEdge,
+	type Material,
+	ThermalComponent,
 	ThermalGraph,
-	SolarAbsorbtionStrategy,
 } from "./classes.ts";
+import {
+	SolarAbsorbtionStrategy,
+	ConductionStrategy,
+} from "./heatTransferStrategy.ts";
 
 const AMBIENT_TEMPERATURE_KELVIN = 293.15; // [K]
 
