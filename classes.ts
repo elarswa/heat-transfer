@@ -103,6 +103,7 @@ export class ThermalComponent {
 	volume: number; // [m³]
 	temperature: number; // [K]
 	log: number[][] = []; // [time, temperature] pairs
+	logAsCelcius = true;
 
 	constructor(
 		id: string,
@@ -118,7 +119,8 @@ export class ThermalComponent {
 
 	setTemperature(newTemp: number, time: number) {
 		this.temperature = newTemp;
-		this.log.push([time, newTemp]);
+		const tempToLog = this.logAsCelcius ? newTemp - 273.15 : newTemp;
+		this.log.push([time, tempToLog]);
 	}
 
 	getHeatCapacity(): number {
@@ -186,7 +188,7 @@ export class ThermalGraph {
 				const writer = csvWriter.createObjectCsvWriter({
 					path: `./${node.id.split(" ").join("_")}.csv`,
 					header: [
-						{ id: "time", title: "Time" },
+						{ id: "time", title: "Time (s)" },
 						{ id: "temperature", title: "Temperature" },
 					],
 				});
