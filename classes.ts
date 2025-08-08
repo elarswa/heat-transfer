@@ -68,6 +68,12 @@ export class ThermalGraph {
 	nodes: ThermalComponent[] = [];
 	edges: HeatTransferEdge[] = [];
 
+	/**
+	 * key: flow rate m^3/s
+	 * value: ordered list of components in the flow path
+	 */
+	flowMap: Map<number, ThermalComponent[]> = new Map();
+
 	simulateStep(dt: number, elapsedTime: number) {
 		const componentToNetHeat = new Map<ThermalComponent, number>();
 
