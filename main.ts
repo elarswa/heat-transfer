@@ -7,10 +7,15 @@ import {
 import {
 	SolarAbsorbtionStrategy,
 	ConductionStrategy,
+	ConvectionStrategy,
 } from "./heatTransferStrategy.ts";
 
 const AMBIENT_TEMPERATURE_KELVIN = 293.15; // [K]
 
+const waterToWaterHeatTransferCoefficient = 340; // [W/m²·K]
+const pipeLength = 10; // [m]
+const pipeSurfaceArea = 0.1; // [m²]
+const solarPanelSurfaceArea = 4.0; // [m²]
 // https://thermtest.com/thermal-resources/materials-database
 // emissivity https://www.engineeringtoolbox.com/emissivity-coefficients-d_447.html
 // absorptivity https://www.engineeringtoolbox.com/solar-radiation-absorbed-materials-d_1568.html
@@ -47,6 +52,10 @@ const steel: Material = {
 	density: 7920, // [kg/m³]
 };
 
+// TODO: refactor, move materials to separate file
+// TODO: refactor, move components to separate file
+// TODO: refactor, move edges to separate file
+
 // dummy component, do not add to graph, just create edge
 const solarRadiationComponent: ThermalComponent = {
 	id: "sun",
@@ -65,12 +74,21 @@ const solarComponent = new ThermalComponent(
 	1.0,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
-const pipeWaterComponent = new ThermalComponent(
-	"pipe water",
+
+const waterContactingPanel = new ThermalComponent(
+	"water contacting panel",
+	water,
+	0.1, // volume in contact with the water
+	AMBIENT_TEMPERATURE_KELVIN,
+);
+
+const waterInPipe = new ThermalComponent(
+	"water in pipe",
 	water,
 	1.0,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
+
 const airComponent = new ThermalComponent(
 	"air",
 	air,
@@ -96,25 +114,28 @@ const waterStorageComponent = new ThermalComponent(
 	AMBIENT_TEMPERATURE_KELVIN,
 );
 
-const pipeLength = 10; // [m]
-const pipeSurfaceArea = 0.1; // [m²]
-
 const solarRadiationEdge = new HeatTransferEdge(
 	solarRadiationComponent,
 	solarComponent,
-	new SolarAbsorbtionStrategy(1000, 4.0), // 1000 W/m² solar radiation, 1.0 m² surface area
+	new SolarAbsorbtionStrategy(1000, solarPanelSurfaceArea), // 1000 W/m² solar radiation, 1.0 m² surface area
 );
 
 const solarToWaterEdge = new HeatTransferEdge(
 	solarComponent,
-	pipeWaterComponent,
+	waterContactingPanel,
 	new ConductionStrategy(1, pipeSurfaceArea),
 );
 
 const waterToPipeEdge = new HeatTransferEdge(
-	pipeWaterComponent,
+	waterInPipe,
 	pipeComponent,
 	new ConductionStrategy(pipeLength, pipeSurfaceArea),
+);
+
+const waterToWater = new HeatTransferEdge(
+	waterContactingPanel,
+	waterInPipe,
+	new ConvectionStrategy(1, waterToWaterHeatTransferCoefficient),
 );
 
 const pipeToAirEdge = new HeatTransferEdge(
@@ -123,18 +144,39 @@ const pipeToAirEdge = new HeatTransferEdge(
 	new ConductionStrategy(pipeLength, pipeSurfaceArea), // TODO: probably wrong value inputs
 );
 
+const panelToAir = new HeatTransferEdge(
+	solarComponent,
+	airComponent,
+	new ConductionStrategy(1.0, solarPanelSurfaceArea),
+);
+
+// TODO model copper pipe heat exchanger into water storage tank
+
 const graph = new ThermalGraph();
+
 // only add nodes which need to be logged
-graph.nodes = [solarComponent, pipeWaterComponent, pipeComponent];
+graph.nodes = [
+	solarComponent,
+	waterContactingPanel,
+	waterInPipe,
+	pipeComponent,
+];
+
+// add an edge for every transfer in the system
 graph.edges = [
-	solarToWaterEdge,
 	solarRadiationEdge,
+	panelToAir,
+	solarToWaterEdge,
 	waterToPipeEdge,
 	pipeToAirEdge,
+	waterToWater,
 ];
 
 const simulationTimeSeconds = 3600 * 4; // 4 hours
 const simulationStepSeconds = 60 * 10; // 10 minutes
+
+// todo const flowRate = (waterInPipe.volume + waterContactingPanel.volume ) /
+// TODO: const simulationStepSecondsBasedOnFlowRate = pipeLength * pipecrossSectionArea;
 
 for (let t = 0; t < simulationTimeSeconds; t += simulationStepSeconds) {
 	// simulate every minute
