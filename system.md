@@ -1,4 +1,4 @@
-solar system - models a passive solar water heating system as found here https://www.energy.gov/energysaver/solar-water-heaters
+solar system - models a active closed loop solar water heating system as found here https://www.energy.gov/energysaver/solar-water-heaters
 collector is typically made of copper, stainless steel, or aluminum
 
 ## 1D Transient Conduction
