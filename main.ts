@@ -10,14 +10,7 @@ import {
 	cmp_storageTank,
 	cmp_fluidInHeatExchanger,
 } from "./components.ts";
-import {
-	e_fluidToFluidInPipe,
-	e_fluidToPipe,
-	e_panelToAir,
-	e_panelToFluid,
-	e_pipeToAir,
-	e_solarRadiation,
-} from "./edges.ts";
+import { allEdges } from "./edges.ts";
 
 const graph = new ThermalGraph();
 
@@ -35,14 +28,7 @@ graph.nodes = [
 ];
 
 // add an edge for every transfer in the system
-graph.edges = [
-	e_solarRadiation,
-	e_panelToAir,
-	e_panelToFluid,
-	e_fluidToPipe,
-	e_pipeToAir,
-	e_fluidToFluidInPipe,
-];
+graph.edges = allEdges;
 
 const simulationTimeSeconds = 3600 * 4; // 4 hours
 const simulationStepSeconds = 60 * 10; // 10 minutes
