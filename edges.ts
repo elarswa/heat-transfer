@@ -20,10 +20,10 @@ import {
 
 export const waterToWaterHeatTransferCoefficient = 340; // [W/m²·K]
 export const pipeLength = 10; // [m]
-export const pipeSurfaceArea = 0.2; // [m²]
-export const exchangerSurfaceArea = 3.0; // [m²]
+export const pipeSurfaceArea = 0.5; // [m²]
+export const exchangerSurfaceArea = 10.0; // [m²]
 export const storageTankSurfaceArea = 3.0; // [m²]
-export const solarPanelSurfaceArea = 4.0; // [m²]
+export const solarPanelSurfaceArea = 10.0; // [m²]
 
 const e_solarRadiation = new HeatTransferEdge(
 	cmp_solarRadiation,
@@ -34,7 +34,7 @@ const e_solarRadiation = new HeatTransferEdge(
 const e_panelToFluid = new HeatTransferEdge(
 	cmp_solarPanel,
 	cmp_fluidContactingPanel,
-	new ConductionStrategy(1, pipeSurfaceArea),
+	new ConductionStrategy(1, solarPanelSurfaceArea * 0.8),
 );
 
 const e_fluidToPipe = new HeatTransferEdge(
