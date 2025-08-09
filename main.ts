@@ -16,10 +16,12 @@ const waterToWaterHeatTransferCoefficient = 340; // [W/m²·K]
 const pipeLength = 10; // [m]
 const pipeSurfaceArea = 0.1; // [m²]
 const solarPanelSurfaceArea = 4.0; // [m²]
+
 // https://thermtest.com/thermal-resources/materials-database
 // emissivity https://www.engineeringtoolbox.com/emissivity-coefficients-d_447.html
 // absorptivity https://www.engineeringtoolbox.com/solar-radiation-absorbed-materials-d_1568.html
-const copper: Material = {
+
+const m_copper: Material = {
 	name: "Copper",
 	thermalConductivity: 397.48, // [W/m·K]
 	specificHeat: 385, // [J/kg·K]
@@ -28,15 +30,15 @@ const copper: Material = {
 	density: 8940, // [kg/m³]
 };
 
-const water: Material = {
-	name: "Water liquid",
+const m_water: Material = {
+	name: "Water",
 	thermalConductivity: 0.60652, // [W/m·K]
 	specificHeat: 4181, // [J/kg·K]
 	emissivity: 0.95, // [0-1] for radiation calculations
 	density: 997.05, // [kg/m³]
 };
 
-const air: Material = {
+const m_air: Material = {
 	name: "Air",
 	thermalConductivity: 0.025, // [W/m·K]
 	specificHeat: 1004, // [J/kg·K]
@@ -57,7 +59,7 @@ const steel: Material = {
 // TODO: refactor, move edges to separate file
 
 // dummy component, do not add to graph, just create edge
-const solarRadiationComponent: ThermalComponent = {
+const cmp_solarRadiation: ThermalComponent = {
 	id: "sun",
 	material: {} as Material,
 	temperature: 5800,
@@ -68,85 +70,100 @@ const solarRadiationComponent: ThermalComponent = {
 	logAsCelcius: true,
 };
 
-const solarComponent = new ThermalComponent(
+const cmp_solarPanel = new ThermalComponent(
 	"solar panel",
-	copper,
+	m_copper,
 	1.0,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
 
-const waterContactingPanel = new ThermalComponent(
-	"water contacting panel",
-	water,
-	0.1, // volume in contact with the water
+const cmp_fluidContactingPanel = new ThermalComponent(
+	"fluid contacting panel",
+	m_water,
+	0.1, // volume in contact with the fluid
 	AMBIENT_TEMPERATURE_KELVIN,
 );
 
-const waterInPipe = new ThermalComponent(
-	"water in pipe",
-	water,
+const cmp_fluidInPipe = new ThermalComponent(
+	"fluid in pipe",
+	m_water,
 	1.0,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
 
-const airComponent = new ThermalComponent(
+const ambientAir = new ThermalComponent(
 	"air",
-	air,
+	m_air,
 	99999999999,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
-const pipeComponent = new ThermalComponent(
+const cmp_pipe = new ThermalComponent(
 	"pipe",
 	steel,
 	1.0,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
-const storageTankComponent = new ThermalComponent(
+const cmp_storageTank = new ThermalComponent(
 	"storage tank",
 	steel,
 	1.0,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
-const waterStorageComponent = new ThermalComponent(
-	"water storage",
-	water,
+
+const cmp_heatExchanger = new ThermalComponent(
+	"heat exchanger",
+	m_copper,
+	1.0,
+	AMBIENT_TEMPERATURE_KELVIN,
+);
+
+const cmp = new ThermalComponent(
+	"fluid in heat exchanger",
+	m_water,
 	5.0,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
 
-const solarRadiationEdge = new HeatTransferEdge(
-	solarRadiationComponent,
-	solarComponent,
+const cmp_fluidInStorage = new ThermalComponent(
+	"fluid in storage",
+	m_water,
+	5.0,
+	AMBIENT_TEMPERATURE_KELVIN,
+);
+
+const e_solarRadiation = new HeatTransferEdge(
+	cmp_solarRadiation,
+	cmp_solarPanel,
 	new SolarAbsorbtionStrategy(1000, solarPanelSurfaceArea), // 1000 W/m² solar radiation, 1.0 m² surface area
 );
 
-const solarToWaterEdge = new HeatTransferEdge(
-	solarComponent,
-	waterContactingPanel,
+const e_panelToFluid = new HeatTransferEdge(
+	cmp_solarPanel,
+	cmp_fluidContactingPanel,
 	new ConductionStrategy(1, pipeSurfaceArea),
 );
 
-const waterToPipeEdge = new HeatTransferEdge(
-	waterInPipe,
-	pipeComponent,
+const e_fluidToPipe = new HeatTransferEdge(
+	cmp_fluidInPipe,
+	cmp_pipe,
 	new ConductionStrategy(pipeLength, pipeSurfaceArea),
 );
 
-const waterToWater = new HeatTransferEdge(
-	waterContactingPanel,
-	waterInPipe,
+const e_fluidToFluidInPipe = new HeatTransferEdge(
+	cmp_fluidContactingPanel,
+	cmp_fluidInPipe,
 	new ConvectionStrategy(1, waterToWaterHeatTransferCoefficient),
 );
 
-const pipeToAirEdge = new HeatTransferEdge(
-	pipeComponent,
-	airComponent,
+const e_pipeToAir = new HeatTransferEdge(
+	cmp_pipe,
+	ambientAir,
 	new ConductionStrategy(pipeLength, pipeSurfaceArea), // TODO: probably wrong value inputs
 );
 
-const panelToAir = new HeatTransferEdge(
-	solarComponent,
-	airComponent,
+const e_panelToAir = new HeatTransferEdge(
+	cmp_solarPanel,
+	ambientAir,
 	new ConductionStrategy(1.0, solarPanelSurfaceArea),
 );
 
@@ -156,20 +173,24 @@ const graph = new ThermalGraph();
 
 // only add nodes which need to be logged
 graph.nodes = [
-	solarComponent,
-	waterContactingPanel,
-	waterInPipe,
-	pipeComponent,
+	cmp_solarPanel,
+	cmp_fluidContactingPanel,
+	cmp_fluidInPipe,
+	cmp_pipe,
+	cpm_fluidInHeatExchanger,
+	cmp_heatExchanger,
+	cmp_fluidInStorage,
+	cmp_storageTank,
 ];
 
 // add an edge for every transfer in the system
 graph.edges = [
-	solarRadiationEdge,
-	panelToAir,
-	solarToWaterEdge,
-	waterToPipeEdge,
-	pipeToAirEdge,
-	waterToWater,
+	e_solarRadiation,
+	e_panelToAir,
+	e_panelToFluid,
+	e_fluidToPipe,
+	e_pipeToAir,
+	e_fluidToFluidInPipe,
 ];
 
 const simulationTimeSeconds = 3600 * 4; // 4 hours
