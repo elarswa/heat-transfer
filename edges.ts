@@ -21,7 +21,7 @@ import {
 export const waterToWaterHeatTransferCoefficient = 340; // [W/m²·K]
 export const pipeLength = 10; // [m]
 export const pipeSurfaceArea = 0.2; // [m²]
-export const exchangerSurfaceArea = 0.2; // [m²]
+export const exchangerSurfaceArea = 3.0; // [m²]
 export const storageTankSurfaceArea = 3.0; // [m²]
 export const solarPanelSurfaceArea = 4.0; // [m²]
 
