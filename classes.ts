@@ -26,7 +26,7 @@ export class ThermalComponent {
 		volume: number,
 		initialTemp: number,
 	) {
-		this.id = id;
+		this.id = `${id.split(" ").join("_")} ${material.name.split(" ").join("_")}`;
 		this.material = material;
 		this.volume = volume;
 		this.temperature = initialTemp;
@@ -113,7 +113,7 @@ export class ThermalGraph {
 
 		const headers = this.nodes.flatMap((node) => {
 			const { time, temperature } = (() => {
-				const safeId = node.id.split(" ").join("_");
+				const safeId = node.id;
 				const time = `time_${safeId}`;
 				const temperature = `temperature_${safeId}`;
 				nodeToIds.set(node, {
