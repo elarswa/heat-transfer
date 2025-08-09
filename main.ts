@@ -14,18 +14,21 @@ import { allEdges } from "./edges.ts";
 
 const graph = new ThermalGraph();
 
-// only add nodes which need to be logged
-graph.nodes = [
-	cmp_solarPanel,
-	cmp_fluidContactingPanel,
-	cmp_fluidInPipe,
-	cmp_pipe,
-	cmp_fluidInHeatExchanger,
-	cmp_heatExchanger,
-	cmp_fluidInStorage,
-	cmp_storageTank,
-	cmp_returnPipe,
-];
+//  add nodes which need to be logged
+graph.nodes = Array.from(
+	new Set([
+		cmp_fluidContactingPanel,
+		cmp_fluidInHeatExchanger,
+		cmp_fluidInPipe,
+		cmp_fluidInReturnPipe,
+		cmp_fluidInStorage,
+		cmp_heatExchanger,
+		cmp_pipe,
+		cmp_returnPipe,
+		cmp_solarPanel,
+		cmp_storageTank,
+	]),
+);
 
 // add an edge for every transfer in the system
 graph.edges = allEdges;
