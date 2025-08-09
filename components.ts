@@ -120,3 +120,10 @@ export const cmp_returnPipe = new ThermalComponent(
 	1.0,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
+
+export const cmp_fluidInReturnPipe = new ThermalComponent(
+	"fluid in return pipe",
+	m_water,
+	1.0,
+	AMBIENT_TEMPERATURE_KELVIN,
+);
