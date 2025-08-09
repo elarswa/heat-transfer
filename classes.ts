@@ -105,26 +105,61 @@ export class ThermalGraph {
 		}
 	}
 
-	writeNodeLogsToCSV() {
-		Promise.all(
-			this.nodes.map(async (node) => {
-				const writer = csvWriter.createObjectCsvWriter({
-					path: `./${node.id.split(" ").join("_")}.csv`,
-					header: [
-						{ id: "time", title: "Time (s)" },
-						{ id: "temperature", title: "Temperature" },
-					],
+	async writeNodeLogsToCSV() {
+		const nodeToIds = new Map<
+			ThermalComponent,
+			{ time: string; temperature: string }
+		>();
+
+		const headers = this.nodes.flatMap((node) => {
+			const { time, temperature } = (() => {
+				const safeId = node.id.split(" ").join("_");
+				const time = `time_${safeId}`;
+				const temperature = `temperature_${safeId}`;
+				nodeToIds.set(node, {
+					time: time,
+					temperature: temperature,
+				});
+				return { time: time, temperature: temperature };
+			})();
+
+			return [
+				{
+					id: time,
+					title: `Time (s) ${node.id}`,
+				},
+				{
+					id: temperature,
+					title: `Temperature ${node.id}`,
+				},
+			];
 				});
 
-				const records = node.log.map(([time, temperature]) => {
+		const maxLogLength = Math.max(...this.nodes.map((node) => node.log.length));
+
+		const records: Record<string, number | string>[] = [];
+		for (let i = 0; i < maxLogLength; i++) {
 					const record: Record<string, number | string> = {};
-					record.time = time;
-					record.temperature = temperature;
-					return record;
+			for (const node of this.nodes) {
+				const { time, temperature } = nodeToIds.get(node) || {};
+				if (!time || !temperature) throw new Error("Node ID not found");
+
+				if (node.log[i]) {
+					record[time] = node.log[i][0];
+					record[temperature] = node.log[i][1];
+				} else {
+					record[time] = "";
+					record[temperature] = "";
+				}
+			}
+			records.push(record);
+		}
+
+		const writer = csvWriter.createObjectCsvWriter({
+			path: "./results.csv",
+			header: headers,
 				});
 
 				await writer.writeRecords(records);
-			}),
-		);
 	}
 }
