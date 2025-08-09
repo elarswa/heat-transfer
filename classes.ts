@@ -65,7 +65,9 @@ export class HeatTransferEdge {
 }
 
 export class ThermalGraph {
+	/** Thermal Components utilized in HeatTransferEdges which you want logging heat over time */
 	nodes: ThermalComponent[] = [];
+	/** HeatTransferEdges connecting ThermalComponents. Represents all heat transfers in the system */
 	edges: HeatTransferEdge[] = [];
 
 	/**
