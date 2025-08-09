@@ -134,7 +134,7 @@ export class ThermalGraph {
 
 		const records: Record<string, number | string>[] = [];
 		for (let i = 0; i < maxLogLength; i++) {
-			const time = this.nodes[0].log[i][0];
+			const time = this.nodes[0]?.log[i]?.[0];
 			const record: Record<string, number | string> = { time };
 
 			for (const node of this.nodes) {
