@@ -30,7 +30,7 @@ export const m_air: Material = {
 	density: 1.29, // [kg/m³]
 };
 
-export const steel: Material = {
+export const m_steel: Material = {
 	name: "Steel 304",
 	thermalConductivity: 14.644, // [W/m·K]
 	specificHeat: 502, // [J/kg·K]
@@ -81,14 +81,14 @@ export const cmp_ambientAir = new ThermalComponent(
 
 export const cmp_pipe = new ThermalComponent(
 	"pipe",
-	steel,
+	m_steel,
 	1.0,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
 
 export const cmp_storageTank = new ThermalComponent(
 	"storage tank",
-	steel,
+	m_steel,
 	1.0,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
@@ -116,7 +116,7 @@ export const cmp_fluidInStorage = new ThermalComponent(
 
 export const cmp_returnPipe = new ThermalComponent(
 	"return pipe",
-	steel,
+	m_steel,
 	1.0,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
