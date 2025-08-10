@@ -19,7 +19,10 @@ import {
 	SolarAbsorbtionStrategy,
 } from "./heatTransferStrategy";
 
+// https://www.engineersedge.com/heat_transfer/convective_heat_transfer_coefficients__13378.htm
 export const waterToWaterHeatTransferCoefficient = 340; // [W/m²·K]
+export const lowAirSpeedHeatTransferCoefficient = 10; // [W/m²·K]
+export const highAirSpeedHeatTransferCoefficient = 100; // [W/m²·K]
 export const pipeLength = 10; // [m]
 export const pipeSurfaceArea = 0.5; // [m²]
 export const exchangerSurfaceArea = 35.0; // [m²]
