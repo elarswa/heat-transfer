@@ -52,7 +52,7 @@ graph.logNodes = Array.from(
 graph.edges = allEdges;
 
 const simulationTimeSeconds = 3600 * 4; // 4 hours
-const simulationStepSeconds = 60;
+const simulationStepSeconds = 1;
 
 for (let t = 0; t < simulationTimeSeconds; t += simulationStepSeconds) {
 	// simulate every minute
