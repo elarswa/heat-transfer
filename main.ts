@@ -55,7 +55,6 @@ const simulationTimeSeconds = 3600 * 4; // 4 hours
 const simulationStepSeconds = 1;
 
 for (let t = 0; t < simulationTimeSeconds; t += simulationStepSeconds) {
-	// simulate every minute
 	graph.simulateStep(simulationStepSeconds, t);
 }
 graph.writeNodeLogsToCSV();

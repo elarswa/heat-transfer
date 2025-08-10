@@ -34,7 +34,7 @@ export const solarPanelSurfaceArea = 10.0; // [m²]
 const e_solarRadiation = new HeatTransferEdge(
 	cmp_solarRadiation,
 	cmp_solarPanel,
-	new SolarAbsorbtionStrategy(1000, solarPanelSurfaceArea), // 1000 W/m² solar radiation, 1.0 m² surface area
+	new SolarAbsorbtionStrategy(1000, solarPanelSurfaceArea), // 1000 W/m² solar radiation
 );
 
 const e_panelToFluid = new HeatTransferEdge(
