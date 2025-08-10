@@ -27,6 +27,26 @@ export class ConvectionStrategy implements HeatTransferStrategy {
 	}
 }
 
+export class AdvectionStrategy implements HeatTransferStrategy {
+	constructor(
+		private massFlowRate: number, // [kg/s]
+	) {}
+
+	calculateHeatTransfer(from: ThermalComponent, to: ThermalComponent): number {
+		if (from.material !== to.material) {
+			throw new Error(
+				"AdvectionStrategy requires both components to have the same material.",
+			);
+		}
+
+		return (
+			this.massFlowRate *
+			from.getHeatCapacity() *
+			(from.temperature - to.temperature)
+		);
+	}
+}
+
 export class RadiationStrategy implements HeatTransferStrategy {
 	constructor(
 		private surfaceArea: number, // [m²]
