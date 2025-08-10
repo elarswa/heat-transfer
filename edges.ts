@@ -109,7 +109,8 @@ const e_fluidInReturnPipeToReturnPipe = new HeatTransferEdge(
 // #endregion
 
 // #region Fluid
-const flowRate = 0.001; // [kg/s] - example flow rate for advection
+// 0.063 is a gallon per minute in kg/s
+const flowRate = 0.063 * 2; // [kg/s] - example flow rate for advection
 const e_fluidToFluidInPipe = new HeatTransferEdge(
 	cmp_fluidContactingPanel,
 	cmp_fluidInPipe,
