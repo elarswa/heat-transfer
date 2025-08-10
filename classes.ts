@@ -63,8 +63,9 @@ export class HeatTransferEdge {
 }
 
 export class ThermalGraph {
-	/** Thermal Components utilized in HeatTransferEdges which you want logging heat over time */
-	nodes: ThermalComponent[] = [];
+	/** Thermal Components utilized in HeatTransferEdges  */
+	systemNodes: ThermalComponent[] = [];
+	logNodes: ThermalComponent[] = [];
 	/** HeatTransferEdges connecting ThermalComponents. Represents all heat transfers in the system */
 	edges: HeatTransferEdge[] = [];
 
@@ -72,7 +73,7 @@ export class ThermalGraph {
 		const componentToNetHeat = new Map<ThermalComponent, number>();
 
 		// Initialize net heat to 0
-		for (const node of this.nodes) {
+		for (const node of this.systemNodes) {
 			componentToNetHeat.set(node, 0);
 		}
 
@@ -90,7 +91,7 @@ export class ThermalGraph {
 		}
 
 		// appply net temperature change
-		for (const node of this.nodes) {
+		for (const node of this.systemNodes) {
 			const netQ = componentToNetHeat.get(node) ?? 0;
 			const deltaT = (netQ * dt) / node.getHeatCapacity();
 			node.setTemperature(node.temperature + deltaT, elapsedTime);
@@ -100,7 +101,7 @@ export class ThermalGraph {
 	async writeNodeLogsToCSV() {
 		const nodeToIds = new Map<ThermalComponent, { temperature: string }>();
 
-		const headers = this.nodes.flatMap((node) => {
+		const headers = this.logNodes.flatMap((node) => {
 			const { temperature } = (() => {
 				const safeId = node.id;
 				const temperature = `temperature_${safeId}`;
@@ -122,14 +123,16 @@ export class ThermalGraph {
 			title: "Time (s)",
 		});
 
-		const maxLogLength = Math.max(...this.nodes.map((node) => node.log.length));
+		const maxLogLength = Math.max(
+			...this.logNodes.map((node) => node.log.length),
+		);
 
 		const records: Record<string, number | string>[] = [];
 		for (let i = 0; i < maxLogLength; i++) {
-			const time = this.nodes[0]?.log[i]?.[0];
+			const time = this.logNodes[0]?.log[i]?.[0];
 			const record: Record<string, number | string> = { time };
 
-			for (const node of this.nodes) {
+			for (const node of this.logNodes) {
 				const { temperature } = nodeToIds.get(node) || {};
 
 				if (!temperature) throw new Error("Node ID not found");

@@ -1,21 +1,22 @@
 import { ThermalGraph } from "./classes.ts";
 import {
+	cmp_ambientAir,
 	cmp_fluidContactingPanel,
+	cmp_fluidInHeatExchanger,
 	cmp_fluidInPipe,
+	cmp_fluidInReturnPipe,
 	cmp_fluidInStorage,
 	cmp_heatExchanger,
 	cmp_pipe,
 	cmp_returnPipe,
 	cmp_solarPanel,
 	cmp_storageTank,
-	cmp_fluidInHeatExchanger,
 } from "./components.ts";
 import { allEdges } from "./edges.ts";
 
 const graph = new ThermalGraph();
 
-//  add nodes which need to be logged
-graph.nodes = Array.from(
+graph.systemNodes = Array.from(
 	new Set([
 		cmp_fluidContactingPanel,
 		cmp_fluidInHeatExchanger,
@@ -27,6 +28,23 @@ graph.nodes = Array.from(
 		cmp_returnPipe,
 		cmp_solarPanel,
 		cmp_storageTank,
+		cmp_ambientAir,
+	]),
+);
+
+graph.logNodes = Array.from(
+	new Set([
+		cmp_fluidContactingPanel,
+		cmp_fluidInHeatExchanger,
+		cmp_fluidInPipe,
+		cmp_fluidInReturnPipe,
+		cmp_fluidInStorage,
+		cmp_heatExchanger,
+		cmp_pipe,
+		cmp_returnPipe,
+		cmp_solarPanel,
+		cmp_storageTank,
+		cmp_ambientAir,
 	]),
 );
 
@@ -34,10 +52,7 @@ graph.nodes = Array.from(
 graph.edges = allEdges;
 
 const simulationTimeSeconds = 3600 * 4; // 4 hours
-const simulationStepSeconds = 60 * 10; // 10 minutes
-
-// todo const flowRate = (waterInPipe.volume + waterContactingPanel.volume ) /
-// TODO: const simulationStepSecondsBasedOnFlowRate = pipeLength * pipecrossSectionArea;
+const simulationStepSeconds = 60;
 
 for (let t = 0; t < simulationTimeSeconds; t += simulationStepSeconds) {
 	// simulate every minute
