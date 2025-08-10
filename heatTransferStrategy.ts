@@ -44,8 +44,8 @@ export class AdvectionStrategy implements HeatTransferStrategy {
 
 		return (
 			this.massFlowRate *
-			from.material.specificHeat *
-			(from.temperature - to.temperature)
+			from.material.specificHeat * // [J/kg·K]
+			from.temperature
 		);
 	}
 }
