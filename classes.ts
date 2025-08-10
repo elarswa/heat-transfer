@@ -1,8 +1,6 @@
 import * as csvWriter from "csv-writer";
 import type { HeatTransferStrategy } from "./heatTransferStrategy";
 
-// TODO: add mass flow rate handling to simulate fluid pump
-
 export interface Material {
 	name: string;
 	thermalConductivity: number; // [W/m·K]
@@ -70,12 +68,6 @@ export class ThermalGraph {
 	/** HeatTransferEdges connecting ThermalComponents. Represents all heat transfers in the system */
 	edges: HeatTransferEdge[] = [];
 
-	/**
-	 * key: flow rate m^3/s
-	 * value: ordered list of components in the flow path
-	 */
-	flowMap: Map<number, ThermalComponent[]> = new Map();
-
 	simulateStep(dt: number, elapsedTime: number) {
 		const componentToNetHeat = new Map<ThermalComponent, number>();
 
@@ -97,7 +89,7 @@ export class ThermalGraph {
 			);
 		}
 
-		// Update temperatures
+		// appply net temperature change
 		for (const node of this.nodes) {
 			const netQ = componentToNetHeat.get(node) ?? 0;
 			const deltaT = (netQ * dt) / node.getHeatCapacity();
@@ -124,7 +116,7 @@ export class ThermalGraph {
 					title: `Temperature ${node.id}`,
 				},
 			];
-				});
+		});
 		headers.unshift({
 			id: "time",
 			title: "Time (s)",
@@ -155,8 +147,8 @@ export class ThermalGraph {
 		const writer = csvWriter.createObjectCsvWriter({
 			path: "./results.csv",
 			header: headers,
-				});
+		});
 
-				await writer.writeRecords(records);
+		await writer.writeRecords(records);
 	}
 }
