@@ -15,18 +15,18 @@ import {
 } from "./components";
 import {
 	AdvectionStrategy,
-	ConductionStrategy,
 	ConvectionStrategy,
 	SolarAbsorbtionStrategy,
 } from "./heatTransferStrategy";
 
 // https://www.engineersedge.com/heat_transfer/convective_heat_transfer_coefficients__13378.htm
-export const waterToWaterHeatTransferCoefficient = 340; // [W/m²·K]
 export const lowAirSpeedHeatTransferCoefficient = 10; // [W/m²·K]
 export const highAirSpeedHeatTransferCoefficient = 100; // [W/m²·K]
+export const waterCopperHeatTransferCoefficient = 2500; // [W/m²·K]
+export const waterSteelHeatTransferCoefficient = 400; // [W/m²·K]
 export const pipeLength = 10; // [m]
 export const pipeSurfaceArea = 0.5; // [m²]
-export const exchangerSurfaceArea = 35.0; // [m²]
+export const exchangerSurfaceArea = 10.0; // [m²]
 export const storageTankSurfaceArea = 3.0; // [m²]
 export const solarPanelSurfaceArea = 10.0; // [m²]
 
@@ -40,7 +40,10 @@ const e_solarRadiation = new HeatTransferEdge(
 const e_panelToFluid = new HeatTransferEdge(
 	cmp_solarPanel,
 	cmp_fluidContactingPanel,
-	new ConductionStrategy(1, solarPanelSurfaceArea * 0.8),
+	new ConvectionStrategy(
+		solarPanelSurfaceArea,
+		waterCopperHeatTransferCoefficient,
+	),
 );
 // #endregion
 
@@ -80,31 +83,40 @@ const e_returnPipeToAir = new HeatTransferEdge(
 const e_fluidToPipe = new HeatTransferEdge(
 	cmp_fluidInPipe,
 	cmp_pipe,
-	new ConductionStrategy(pipeLength, pipeSurfaceArea),
+	new ConvectionStrategy(pipeSurfaceArea, waterSteelHeatTransferCoefficient),
 );
 
 const e_fluidInExchangerToExchanger = new HeatTransferEdge(
 	cmp_fluidInHeatExchanger,
 	cmp_heatExchanger,
-	new ConductionStrategy(pipeLength, exchangerSurfaceArea),
+	new ConvectionStrategy(
+		exchangerSurfaceArea,
+		waterCopperHeatTransferCoefficient,
+	),
 );
 
 const e_exchangerToFluidInStorage = new HeatTransferEdge(
 	cmp_heatExchanger,
 	cmp_fluidInStorage,
-	new ConductionStrategy(pipeLength, exchangerSurfaceArea),
+	new ConvectionStrategy(
+		exchangerSurfaceArea,
+		waterCopperHeatTransferCoefficient,
+	),
 );
 
 const e_fluidInStorageToStorageTank = new HeatTransferEdge(
 	cmp_fluidInStorage,
 	cmp_storageTank,
-	new ConductionStrategy(pipeLength, storageTankSurfaceArea),
+	new ConvectionStrategy(
+		storageTankSurfaceArea,
+		waterSteelHeatTransferCoefficient,
+	),
 );
 
 const e_fluidInReturnPipeToReturnPipe = new HeatTransferEdge(
 	cmp_fluidInReturnPipe,
 	cmp_returnPipe,
-	new ConductionStrategy(pipeLength, pipeSurfaceArea),
+	new ConvectionStrategy(pipeSurfaceArea, waterSteelHeatTransferCoefficient),
 );
 // #endregion
 
