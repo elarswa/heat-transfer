@@ -11,7 +11,7 @@ export const m_copper: Material = {
 	thermalConductivity: 397.48, // [W/m·K]
 	specificHeat: 385, // [J/kg·K]
 	emissivity: 0.03, // [0-1] for radiation calculations
-	absorptivity: 0.64,
+	absorptivity: 0.94, // high aborbtion for solar radiation like it is painted black
 	density: 8940, // [kg/m³]
 };
 
