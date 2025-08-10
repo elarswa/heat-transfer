@@ -14,6 +14,7 @@ import {
 	cmp_fluidInStorage,
 } from "./components";
 import {
+	AdvectionStrategy,
 	ConductionStrategy,
 	ConvectionStrategy,
 	SolarAbsorbtionStrategy,
@@ -108,30 +109,32 @@ const e_fluidInReturnPipeToReturnPipe = new HeatTransferEdge(
 // #endregion
 
 // #region Fluid
+const flowRate = 0.001; // [kg/s] - example flow rate for advection
 const e_fluidToFluidInPipe = new HeatTransferEdge(
 	cmp_fluidContactingPanel,
 	cmp_fluidInPipe,
-	new ConvectionStrategy(1, waterToWaterHeatTransferCoefficient),
+	new AdvectionStrategy(flowRate),
 );
 
 const e_fluidToHeatExchangeFluid = new HeatTransferEdge(
 	cmp_fluidInPipe,
 	cmp_fluidInHeatExchanger,
-	new ConvectionStrategy(1, waterToWaterHeatTransferCoefficient),
+	new AdvectionStrategy(flowRate),
 );
 
 const e_heatExchangeFluidToReturnFluid = new HeatTransferEdge(
 	cmp_fluidInHeatExchanger,
 	cmp_fluidInReturnPipe,
-	new ConvectionStrategy(1, waterToWaterHeatTransferCoefficient),
+	new AdvectionStrategy(flowRate),
 );
 
 const e_fluidInReturnToFluidAtPanel = new HeatTransferEdge(
 	cmp_fluidInReturnPipe,
 	cmp_fluidContactingPanel,
-	new ConvectionStrategy(1, waterToWaterHeatTransferCoefficient),
+	new AdvectionStrategy(flowRate),
 );
 // #endregion
+
 export const allEdges = [
 	e_exchangerToFluidInStorage,
 	e_fluidInExchangerToExchanger,
