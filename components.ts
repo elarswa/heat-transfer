@@ -68,7 +68,7 @@ export const cmp_fluidContactingPanel = new ThermalComponent(
 export const cmp_fluidInPipe = new ThermalComponent(
 	"fluid in pipe",
 	m_water,
-	1.0,
+	0.1,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
 
@@ -103,7 +103,7 @@ export const cmp_heatExchanger = new ThermalComponent(
 export const cmp_fluidInHeatExchanger = new ThermalComponent(
 	"fluid in heat exchanger",
 	m_water,
-	1.0,
+	0.1,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
 
@@ -117,13 +117,13 @@ export const cmp_fluidInStorage = new ThermalComponent(
 export const cmp_returnPipe = new ThermalComponent(
 	"return pipe",
 	m_steel,
-	1.0,
+	0.1,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
 
 export const cmp_fluidInReturnPipe = new ThermalComponent(
 	"fluid in return pipe",
 	m_water,
-	1.0,
+	0.1,
 	AMBIENT_TEMPERATURE_KELVIN,
 );
