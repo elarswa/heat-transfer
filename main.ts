@@ -40,11 +40,11 @@ graph.logNodes = Array.from(
 		cmp_fluidInReturnPipe,
 		cmp_fluidInStorage,
 		cmp_heatExchanger,
-		cmp_pipe,
-		cmp_returnPipe,
+		// cmp_pipe,
+		// cmp_returnPipe,
 		cmp_solarPanel,
-		cmp_storageTank,
-		cmp_ambientAir,
+		// cmp_storageTank,
+		// cmp_ambientAir,
 	]),
 );
 
