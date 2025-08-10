@@ -47,25 +47,31 @@ const e_panelToFluid = new HeatTransferEdge(
 const e_pipeToAir = new HeatTransferEdge(
 	cmp_pipe,
 	cmp_ambientAir,
-	new ConductionStrategy(pipeLength, pipeSurfaceArea),
+	new ConvectionStrategy(pipeSurfaceArea, lowAirSpeedHeatTransferCoefficient),
 );
 
 const e_panelToAir = new HeatTransferEdge(
 	cmp_solarPanel,
 	cmp_ambientAir,
-	new ConductionStrategy(1.0, solarPanelSurfaceArea),
+	new ConvectionStrategy(
+		solarPanelSurfaceArea,
+		lowAirSpeedHeatTransferCoefficient,
+	),
 );
 
 const e_storageTankToAir = new HeatTransferEdge(
 	cmp_storageTank,
 	cmp_ambientAir,
-	new ConductionStrategy(pipeLength, storageTankSurfaceArea),
+	new ConvectionStrategy(
+		storageTankSurfaceArea,
+		lowAirSpeedHeatTransferCoefficient,
+	),
 );
 
 const e_returnPipeToAir = new HeatTransferEdge(
 	cmp_returnPipe,
 	cmp_ambientAir,
-	new ConductionStrategy(pipeLength, pipeSurfaceArea),
+	new ConvectionStrategy(pipeSurfaceArea, lowAirSpeedHeatTransferCoefficient),
 );
 // #endregion
 
