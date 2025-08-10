@@ -34,6 +34,7 @@ The simulation supports **conduction**, **convection**, **radiation**, and **adv
 - Modeled as a source component that outputs constant `[W]` to a connected surface (solar panel).
 
 ---
+![System Model](./closed_loop_solar_heat_exchange.png)
 
 ### Future Improvements
 - allow solar irradiance to be modeled as a function of time
