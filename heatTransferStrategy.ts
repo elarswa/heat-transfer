@@ -41,7 +41,7 @@ export class AdvectionStrategy implements HeatTransferStrategy {
 
 		return (
 			this.massFlowRate *
-			from.getHeatCapacity() *
+			from.material.specificHeat *
 			(from.temperature - to.temperature)
 		);
 	}
