@@ -27,6 +27,9 @@ export class ConvectionStrategy implements HeatTransferStrategy {
 	}
 }
 
+/**
+ * Advection strategy for heat transfer in fluids in transit
+ */
 export class AdvectionStrategy implements HeatTransferStrategy {
 	constructor(
 		private massFlowRate: number, // [kg/s]
